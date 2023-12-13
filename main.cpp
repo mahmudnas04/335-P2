@@ -5,10 +5,6 @@ arif.nasif25@myhunter.cuny.edu
 Assignment 2 - Driver code for testing
 */
 
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <chrono> // For timing
 #include "HalfSelectionSort.hpp"
 #include "StandardSort.hpp"
 #include "MergeSort.hpp"
@@ -17,55 +13,73 @@ Assignment 2 - Driver code for testing
 #include "QuickSelect.hpp"
 #include "WorstCaseQuickSelect.hpp"
 #include "MedianOfMediansMethod.hpp"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <chrono> // For timing
 
-// Function to read integers from a file into a vector
-std::vector<int> readIntegersFromFile(const std::string& filename) {
-    std::ifstream inputFile(filename);
-    std::vector<int> numbers;
-
-    int num;
-    while (inputFile >> num) {
-        numbers.push_back(num);
+std::vector<int> readFile(const std::string& filename)
+{
+    std::vector<int> input; // Initialize vector to store integers from the file
+    std::ifstream inputFile(filename);   // Open the file for reading
+    if(!inputFile.is_open())
+    {
+        std::cerr << "Error opening file: " << filename <<std::endl; // Print an error message if file opening fails
+        return input; // Return the empty vector
     }
-    inputFile.close();
-
-    return numbers;
+    std::string line;
+    while (std::getline(inputFile, line))
+    {
+        std::istringstream iss(line);
+        int num;
+        while(iss >> num)
+        {
+            input.push_back(num); // Parse each integer from the line and add it to the vector
+        }
+    }
+    inputFile.close(); // Close the file after reading
+    return input; // Return the vector containing integers from the file
 }
 
-int main() {
-    std::vector<int> originalVector = readIntegersFromFile("input.txt");
+void vectorPrinter(std::vector<int> vector)
+{
+    for(std::vector<int>::iterator it = vector.begin(); it != vector.end(); it++)
+    {
+        std::cout << *it << " "; // Print each element of the vector
+    }
+}
 
-    // Create copies of the original vector for each algorithm
-    std::vector<int> vectorForSelectionSort = originalVector;
-    std::vector<int> vectorForStdSort = originalVector;
-    std::vector<int> vectorForMergeSort = originalVector;
-    std::vector<int> vectorForInPlaceMergeSort = originalVector;
-    std::vector<int> vectorForHeapSort = originalVector;
-    std::vector<int> vectorForQuickSelect = originalVector;
-    std::vector<int> vectorForWorseQuickSelect = originalVector;
-    std::vector<int> vectorForMedianOfMedian = originalVector;
-    // Create copies for other algorithms.
+int main()
+{
+    int num = 0;
+    std::cout<<"select input file\n";
+    std::string filename;
+    std::cin>> filename;
+    std::vector<int> test = readFile(filename); // Read integers from the file and store them in a vector
+    std::cout << "Median before sort: " << test.at((test.size()+1)/2) <<std::endl; // Print the median before sorting
+    vectorPrinter(test); // Print the elements of the vector
 
-    // Variables to hold duration and median for each algorithm
-    int durationSelectionSort = 0, durationStdSort = 0, durationMerge = 0, durationInPlaceMerge = 0, durationHeap = 0, durationQuick = 0, durationWorstQuick = 0, durationMedianOfMed = 0;
-    int medianSelectionSort, medianStdSort, medianMerge, medianInPlaceMerge, medianHeap, medianQuick, medianWroseQuick, medianMedianOfMed;
-    // Variables for other algorithms
+    
+    std::cout << "\n\nSorting with Standard sort\n";
+    std::cout<< "median: "<< standardSort(test, num) <<std::endl;
+    vectorPrinter(test);
+    
+    
 
-   
-    auto start = std::chrono::steady_clock::now();
-    medianSelectionSort = halfSelectionSort(vectorForSelectionSort, durationSelectionSort);
-    auto end = std::chrono::steady_clock::now();
-    std::chrono::duration<double, std::milli> elapsedSelectionSort = end - start;
+    
+    std::cout << "\n\nSorting with half selection sort\n";
+    std::cout<< "median: "<< halfSelectionSort(test, num) <<std::endl;
+    vectorPrinter(test);
+    
+    
+    
+    std::cout << "\n\nSorting with merge sort\n";
+    std::cout<< "median: "<< mergeSort(test, num) <<std::endl; // Print the median after sorting with merge sort
+    vectorPrinter(test); // Print the elements of the vector after sorting
 
-    /*start = std::chrono::steady_clock::now();
-    medianStdSort = standardSort(vectorForStdSort, durationStdSort);
-    end = std::chrono::steady_clock::now();
-    std::chrono::duration<double, std::milli> elapsedStdSort = end - start;*/
-
-    // Print results
-    std::cout << "Half Selection Sort - Median: " << medianSelectionSort << ", Duration: " << elapsedSelectionSort.count() << "ms\n";
-    //std::cout << "Std Sort - Median: " << medianStdSort << ", Duration: " << elapsedStdSort.count() << "ms\n";
-    // Print results for other algorithms...
-
-    return 0;
+    std::cout << "\n\nSorting with Inplace merge sort\n";
+    std::cout<< "median: "<< inPlaceMergeSort(test, num) <<std::endl; // Print the median after sorting with merge sort
+    vectorPrinter(test); // Print the elements of the vector after sorting
 }
